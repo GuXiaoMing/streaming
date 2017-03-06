@@ -1,0 +1,62 @@
+#coding:utf8
+
+#工作路径.
+WORKROOT('../../../../../../')
+
+#使用硬链接copy.
+CopyUsingHardLink(True)
+
+#C编译参数.
+CFLAGS('-g -pipe -W -Wall -fPIC')
+
+#C++编译参数.
+cpp_flags = '-D_GNU_SOURCE -D__STDC_LIMIT_MACROS'
+cxx_flags = '-fPIC -g -pipe -W -Wformat -Wall -Wconversion -Wdeprecated -Winline -pthread'
+cxx_flags = cxx_flags + ' -finline-functions -DSET_COMLOG_APPENDER_MASK'
+CPPFLAGS(cpp_flags)
+CXXFLAGS(cxx_flags)
+
+# #IDL编译参数
+# IDLFLAGS('--compack')
+# 
+# #UBRPC编译参数
+# UBRPCFLAGS('--compack')
+
+#头文件路径.
+INCPATHS('. ./include')
+
+#链接参数.
+LDFLAGS('-lpthread -lcrypto -lcrypt -lz -pthread -lrt')
+
+#依赖模块
+CONFIGS('inf/bigpipe/api/libbigpipe@libbigpipe_1-3-0-11068_PD_BL')
+CONFIGS('public/idlcompiler@idlcompiler_2-0-9-1_PD_BL')
+CONFIGS('public/configure@configure_1-2-9-1_PD_BL')
+CONFIGS('third-64/gflags@gflags_2-0-0-100_PD_BL')
+CONFIGS('third-64/hiredis@hiredis_2-8-19-0_PD_BL')
+CONFIGS('third-64/protobuf@protobuf_2-4-1-500_PD_BL')
+CONFIGS('thirdsrc/protobuf@protobuf_2-4-1-500_PD_BL')
+CONFIGS('third-64/json-cpp@json-cpp_0-6-1-400_PD_BL')
+CONFIGS('public/ub@ub_1-2-88-31748_PD_BL')
+CONFIGS('app/search/ksarch/store/proxy-lib/redis@redis_1-0-8-1_PD_BL')
+# CONFIGS('public/urlparser@urlparser_1-2-0-1_PD_BL')
+CONFIGS('public/urlparser@urlparser_1-2-6-0_PD_BL')
+
+user_sources = GLOB('./src/*.cpp ./src/*.cc')
+user_headers = GLOB('./include')
+
+Application('minos_bigpipe_subscriber',
+            Sources(user_sources,
+			        IncludePaths(user_headers),
+					CppFlags(cpp_flags)),
+			OutputPath('./output/bin'))
+
+TARGET('output/conf',
+       Prefixes('./conf'),
+	   ShellCommands('cp -r ./conf ./output'),
+	   ShellCommands('rm -rf ./output/conf/.svn'),
+	   ShellCommands('mkdir ./output/log'),
+	   CleanCommands('rm -rf ./output/conf'),
+	   CleanCommands('rm -rf ./output/log'),
+	   )
+

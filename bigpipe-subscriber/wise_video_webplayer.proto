@@ -1,0 +1,85 @@
+package baidu.video;
+
+// 语言种类枚举，需要持续补充
+enum LanguageType {
+    ZN_CH = 0;   // 中文
+    THAI = 1;    // 泰文
+    // 以下补充标准列表
+}
+
+// 日志字符编码枚举
+enum CodeType {
+    CODE_TYPE_UNKNOWN = 0;   // 未知
+    UTF8 = 1;      // utf8，建议选用此编码打印
+    GBK = 2;       // gbk
+    GB18030 = 3;   // gb18030
+}
+
+message Common {
+
+
+//--------------------以下描述日志基础信息--------------------
+
+    // 日志所属产品线名称，此名称根据日志的产品线归属自动生成默认值，不需要在程序中添加。
+    optional string product_name = 1;
+
+    // 日志名称，此名称由日志名称自动生成默认值，不需要在程序中添加。
+    optional string module_name = 2;
+
+    // 标识用户request的唯一id。logid主要用处将处理逻辑能够串联起来。我们强烈建议one action one logid。如果上游传入logid，本地将不要再重复生成，而是将上游的logid设置本字段中。
+    required string logid = 3;
+
+    // 此日志中使用的语言，默认为中文，不需要每行都打印，修改default来实现设置。
+    optional LanguageType language = 4[default = ZN_CH];
+
+    // 日志的字符编码，默认为未知，不需要每行都打印，修改default来实现设置。
+    optional CodeType code_type = 5[default = CODE_TYPE_UNKNOWN];
+
+
+//--------------------以下描述日志时间信息--------------------
+
+    // 服务器端记录的日志时间戳，单位为毫秒，此字段必打
+    required int64 timestamp = 10;
+
+}
+
+// 主message名称需要修改成同日志名称一致。
+message WiseVideoWebplayer {
+
+    //----------------------------------------------------------------------------------------------------------------
+    //  以下字段用于描述系统级传输信息，用户不需要关心。默认保留。
+    //----------------------------------------------------------------------------------------------------------------
+
+    //  传输配置字段，默认需要保留
+    optional MetaData metadata                     = 25;
+    optional string   log_tag                      = 26;
+
+
+    // 统一公有字段
+    required Common common = 41;
+
+
+    //----------------------------------------------------------------------------------------------------------------
+    //  以上id小于128的字段为预留字段，不能添加。用户自有字段id从129开始。
+    //----------------------------------------------------------------------------------------------------------------
+     //ip地址
+    optional string mac_address                    = 129;
+    
+    //
+    optional string flag                           = 130;
+    
+    //json数据
+    optional string all_data                       = 131;
+	
+    //类型
+    optional string type                       = 132;
+
+}
+
+// 以下信息用于Minos的传输配置，用户无需关心
+// 如确定不使用Minos，也可以删除
+message MetaData {
+    optional int32 log_module_id   =  1 [default = 1526];
+    optional string log_name        =  2 [default = "wise_video_webplayer"];
+    optional string product_name    =  3 [default = "video"];
+}
